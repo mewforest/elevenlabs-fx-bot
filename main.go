@@ -175,7 +175,7 @@ func actionsHandler(bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
 		case "start":
 			msg.Text = "Привет! Я бот для генерации звуков c помощью AI.\n\n" +
 				"Напиши /generate c текстом для генерации аудио из текста. Например: <code>/generate kick</code>\n\n" +
-				"Бот использует сторонний сервис Eleven Labs, поэтому, пожалуйста, соблюдайте его правила и не злоупотребляйте функционалом бота.\n\n" +
+				"Бот использует сторонний сервис ElevenLabs, поэтому, пожалуйста, соблюдайте его правила и не злоупотребляйте функционалом бота.\n\n" +
 				"Кстати, обязательно подписывайся на мой канал: @mewnotes ⭐"
 			_, err := bot.Send(msg)
 			if err != nil {
@@ -183,6 +183,16 @@ func actionsHandler(bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
 				return err
 			}
 		case "generate":
+			// Check if the command has arguments
+			if update.Message.CommandArguments() == "" {
+				msg.Text = "🤔 Напиши текст для генерации аудио. Например: <code>/generate kick</code>"
+				_, err := bot.Send(msg)
+				if err != nil {
+					errorHandler(err)
+				}
+				return nil
+			}
+			// Generating sound
 			msg.Text = "🎵 Начинаю генерацию аудио..."
 			_, err := bot.Send(msg)
 			if err != nil {
@@ -297,7 +307,7 @@ func main() {
 			continue
 		}
 
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		log.Printf("[@%s (id:%s)] %s", update.Message.From.UserName, update.Message.From.ID, update.Message.Text)
 
 		// Handlers
 		err := actionsHandler(bot, update)
